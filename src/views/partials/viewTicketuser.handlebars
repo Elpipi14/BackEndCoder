@@ -1,0 +1,28 @@
+<h1>Purchase History</h1>
+{{#if tickets.length}}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Ticket ID</th>
+        <th>Date and Time</th>
+        <th>View</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each tickets}}
+        <tr>
+          <td>{{this._id}}</td>
+          <td>{{this.dateTime}}</td>
+          <td>
+            <a
+              href="/purchase/tickets/{{this._id}}"
+              class="btn btn-outline-primary"
+            >View</a>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{else}}
+  <p>You have no purchase history.</p>
+{{/if}}

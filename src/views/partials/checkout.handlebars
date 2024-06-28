@@ -1,0 +1,17 @@
+<h1>Compra completada</h1>
+<h2>Ticket generado</h2>
+<p>Se ha enviado a su correo electrónico</p>
+<p>Información del ticket:</p>
+<ul>
+  <li><strong>Ticket ID:</strong> {{ticket._id}}</li>
+  <li><strong>Productos:</strong>
+    <ul>
+      {{#each ticket.productsBuy}}
+        <li>{{this.product.title}} - Cantidad: {{this.quantity}}</li>
+      {{/each}}
+    </ul>
+  </li>
+  <li><strong>Precio total:</strong> {{ticket.totalPrice}} $</li>
+  <li><strong>Hora:</strong> {{ticket.dateTime}}</li>
+  <li><strong>Email del usuario:</strong> {{ticket.buyerEmail}}</li>
+</ul>

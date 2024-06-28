@@ -1,0 +1,11 @@
+<h1>Ticket Details</h1>
+<p><strong>Ticket ID:</strong> {{ticket._id}}</p>
+<p><strong>Date and Time:</strong> {{ticket.dateTime}}</p>
+<p><strong>Total Price:</strong> {{ticket.totalPrice}} $</p>
+<p><strong>Buyer Email:</strong> {{ticket.buyerEmail}}</p>
+<h2>Products:</h2>
+<ul>
+  {{#each ticket.productsBuy}}
+    <li>Product ID: {{this.product}}, Quantity: {{this.quantity}}</li>
+  {{/each}}
+</ul>

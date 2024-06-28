@@ -1,0 +1,60 @@
+<div class="list_container">
+  <h1 class="title">Products Ecommerce premium</h1>
+  <h2 class="title">Add Product</h2>
+  <form action="/premium/controlpanel" method="post" id="form">
+    <div class="data">
+      <label for="title">Title:</label>
+      <input type="text" name="title" id="title" required />
+
+      <label for="description">Description:</label>
+      <input type="text" name="description" id="description" required />
+
+      <label for="price">Price:</label>
+      <input type="number" name="price" id="price" required />
+
+      <label for="year">Year:</label>
+      <input type="text" name="year" id="year" required />
+    </div>
+    <div class="data_2">
+      <label for="category">Category:</label>
+      <input type="text" name="category" id="category" required />
+
+      <label for="imageUrl">ImageUrl:</label>
+      <input type="url" name="imageUrl" id="imageUrl" required />
+
+      <label for="stock">Stock:</label>
+      <input type="number" name="stock" id="stock" required />
+
+      <label for="code">Code:</label>
+      <input type="text" name="code" id="code" required />
+    </div>
+    <div class="data_add">
+      <br /><br />
+      <input type="submit" value="ADD PRODUCT" />
+    </div>
+  </form>
+</div>
+
+<h2 class="title">List Products</h2>
+
+<div id="home">
+  {{#each products}}
+    <div class="card" style="width: 18rem;">
+      <img src="{{imageUrl}}" class="img-thumbnail img" alt="" />
+      <div class="card_info card-body">
+        <h2 class="card-text">{{title}}</h2>
+        <p class="card-text">Description: {{description}}</p>
+        <p class="card-text">Price: {{price}}</p>
+        <p class="card-text">Stocks: {{stock}}</p>
+        <p class="card-text">Year: {{year}}</p>
+        <p class="card-text">Owner: {{owner}}</p>
+        <button class="btn cart px-auto add-to-cart-btn">
+          <a href="/premium/controlpanel/{{_id}}">Update Product</a>
+        </button>
+        <form action="/premium/controlpanel/{{_id}}?_method=DELETE" method="POST" style="display:inline;">
+          <button type="submit">Delete Product</button>
+        </form>
+      </div>
+    </div>
+  {{/each}}
+</div>
