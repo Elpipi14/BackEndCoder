@@ -120,14 +120,17 @@ export const logOut = async (req, res) => {
 
 export const changePassword = async (req, res) => {
     try {
-        const { email, newPassword, confirmPassword } = req.body;
+        const { newPassword, confirmPassword } = req.body;
+        const email = req.user.email;
         console.log(`el usuario `, email);
+
+        // Verifica que la nueva contraseña y la confirmación coincidan
         if (newPassword !== confirmPassword) {
-            return res.status(400).json({ error: "New passwords do not match" });
+            return res.status(400).redirect("/changepassword-error");
         }
 
-        // Change the user's password
-        await userService.changePassword(email, null, newPassword); // Pass null because oldPassword is not required in this case
+        // Cambia la contraseña del usuario
+        await userService.changePassword(email, newPassword); // Pasa solo el email y la nueva contraseña
 
         req.logger.info("Successfully changed password. Redirecting to Login");
         return res.redirect("/logOut");
@@ -136,6 +139,7 @@ export const changePassword = async (req, res) => {
         return res.status(500).redirect("/changepassword-error");
     }
 };
+
 
 export const requestPasswordChange = async (req, res) => {
     try {

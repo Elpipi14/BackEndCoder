@@ -28,6 +28,9 @@ import handlingError from "./middleware/errros.js";
 //logger winston
 import addLogger from "./utils/logger.js"
 
+//swagger 
+import { setupSwagger } from './helpers/swagger/swagger.js'
+
 // Designa el puerto
 const PORT = 8080;
 // Crea una nueva instancia de la aplicación Express
@@ -69,6 +72,9 @@ app.use(addLogger);
 app.use(routes);
 
 app.use(handlingError);
+
+//swagger 
+setupSwagger(app);
 
 // Crea un servidor HTTP utilizando la aplicación Express
 const httpServer = http.createServer(app);

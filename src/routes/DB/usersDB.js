@@ -11,7 +11,7 @@ routerUser.get("/profile", passport.authenticate("jwt", { session: false, failur
 
 routerUser.get("/logout", controller.logOut);
 
-routerUser.post('/change-password', passport.authenticate("jwt", { session: false }), controller.changePassword);
+routerUser.post('/change-password', passport.authenticate("jwt", { session: false, failureRedirect: "/login" }), controller.changePassword);
 
 routerUser.get('/request-password-change', passport.authenticate("jwt", { session: false }), controller.requestPasswordChange);
 

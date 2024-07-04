@@ -63,16 +63,11 @@ export default class UserManager {
         }
     }
 
-    async changePassword(email, oldPassword, newPassword) {
+    async changePassword(email, newPassword) {
         try {
             const user = await UserModel.findOne({ email });
             if (!user) {
                 throw new Error("User not found");
-            }
-
-            // If oldPassword is provided, verify it. If not, skip this step.
-            if (oldPassword && !isValidPassword(oldPassword, user.password)) {
-                throw new Error("Old password is incorrect");
             }
 
             user.password = createHash(newPassword);
@@ -83,4 +78,5 @@ export default class UserManager {
             throw error;
         }
     }
+
 }
