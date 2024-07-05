@@ -49,9 +49,13 @@
         <p class="card-text">Year: {{year}}</p>
         <p class="card-text">Owner: {{owner}}</p>
         <button class="btn cart px-auto add-to-cart-btn">
-          <a href="/premium/controlpanel/{{_id}}">Update Product</a>
+          <a href="/premium/controlpanel/update/{{_id}}">Update Product</a>
         </button>
-        <form action="/premium/controlpanel/{{_id}}?_method=DELETE" method="POST" style="display:inline;">
+        <form
+          action="/premium/controlpanel/{{_id}}?_method=DELETE"
+          method="POST"
+          style="display:inline;"
+        >
           <button type="submit">Delete Product</button>
         </form>
       </div>

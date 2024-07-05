@@ -114,4 +114,5 @@ export default class ProductsManager {
             throw error;
         }
     }
+
 };

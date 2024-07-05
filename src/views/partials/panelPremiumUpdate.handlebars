@@ -1,0 +1,66 @@
+<h2 class="title">Update Product</h2>
+<form
+  action="/premium/controlpanel/update/{{product._id}}"
+  method="post"
+  id="form"
+>
+  <div class="data">
+    <label for="title">Title:</label>
+    <input type="text" name="title" id="title" value="{{product.title}}" />
+
+    <label for="description">Description:</label>
+    <input
+      type="text"
+      name="description"
+      id="description"
+      value="{{product.description}}"
+    />
+
+    <label for="price">Price:</label>
+    <input type="number" name="price" id="price" value="{{product.price}}" />
+
+    <label for="year">Year:</label>
+    <input type="text" name="year" id="year" value="{{product.year}}" />
+  </div>
+  <div class="data_2">
+    <label for="category">Category:</label>
+    <input
+      type="text"
+      name="category"
+      id="category"
+      value="{{product.category}}"
+      required
+    />
+
+    <label for="imageUrl">ImageUrl:</label>
+    <input
+      type="url"
+      name="imageUrl"
+      id="imageUrl"
+      value="{{product.imageUrl}}"
+      required
+    />
+
+    <label for="stock">Stock:</label>
+    <input
+      type="number"
+      name="stock"
+      id="stock"
+      value="{{product.stock}}"
+      required
+    />
+
+    <label for="code">Code:</label>
+    <input
+      type="text"
+      name="code"
+      id="code"
+      value="{{product.code}}"
+      required
+    />
+  </div>
+  <div class="data_add">
+    <br /><br />
+    <input type="submit" value="UPDATE PRODUCT" />
+  </div>
+</form>

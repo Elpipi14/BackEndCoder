@@ -1,0 +1,208 @@
+openapi: 3.0.1
+info:
+  title: E-commerce API
+  description: API for managing products in an e-commerce platform.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the product
+          example: "Sneaker Model X"
+        price:
+          type: number
+          description: Price of the product
+          example: 99.99
+        description:
+          type: string
+          description: Description of the product
+          example: "High-quality sneaker with modern design."
+        imageUrl:
+          type: string
+          description: URL of the product image
+          example: "http://example.com/image.jpg"
+        status:
+          type: boolean
+          description: Availability status of the product
+          example: true
+        code:
+          type: string
+          description: Unique code of the product
+          example: "SNKX123"
+        stock:
+          type: number
+          description: Stock quantity of the product
+          example: 50
+        category:
+          type: string
+          description: Category of the product
+          example: "Footwear"
+        year:
+          type: string
+          description: Release year of the product
+          example: "2024"
+        owner:
+          type: string
+          description: ID of the owner (premium user) who created the product
+          example: "user123"
+
+paths:
+  /products:
+    get:
+      summary: Shows all the products in the database
+      tags:
+        - Products
+      responses:
+        "200":
+          description: All products retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  payload:
+                    type: object
+                    properties:
+                      products:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Product"
+                      info:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                            example: 10
+                          pages:
+                            type: integer
+                            example: 2
+                          page:
+                            type: integer
+                            example: 1
+                          hasNextPage:
+                            type: boolean
+                            example: true
+                          hasPrevPage:
+                            type: boolean
+                            example: false
+                          nextLink:
+                            type: string
+                            example: "?page=2&limit=10"
+                          prevLink:
+                            type: string
+                            example: null
+        "500":
+          description: Internal server error
+
+  /view/{id}:
+    get:
+      summary: View a specific product
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the product to view
+      responses:
+        "200":
+          description: Product retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+        "500":
+          description: Internal server error
+
+  /premium/controlpanel:
+    post:
+      summary: Create a new product (premium users only)
+      tags:
+        - Premium Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        "201":
+          description: Product created successfully
+        "500":
+          description: Internal server error
+
+    get:
+      summary: Get products created by the authenticated premium user
+      tags:
+        - Premium Products
+      responses:
+        "200":
+          description: Products retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+        "500":
+          description: Internal server error
+
+  /premium/controlpanel/{id}:
+    delete:
+      summary: Delete a product (premium users only)
+      tags:
+        - Premium Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the product to delete
+      responses:
+        "200":
+          description: Product deleted successfully
+        "404":
+          description: Product not found
+        "500":
+          description: Internal server error
+
+    post:
+      summary: Update a product (premium users only)
+      tags:
+        - Premium Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the product to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        "200":
+          description: Product updated successfully
+        "403":
+          description: You are not allowed to update this product
+        "404":
+          description: Product not found
+        "500":
+          description: Internal server error

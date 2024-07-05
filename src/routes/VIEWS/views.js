@@ -36,6 +36,10 @@ routerViews.get('/premium/controlpanel', passport.authenticate('jwt-admin', { se
     res.render('partials/panelPremium');
 });
 
+routerViews.get('/premium/controlpanel/update/:id', passport.authenticate('jwt-admin', { session: false, failureRedirect: "/profile" }), async (req, res) => {
+    res.render('partials/panelPremiumUpdate');
+});
+
 // Carts
 routerViews.get('/cart', passport.authenticate("jwt", { session: false }), async (req, res) => {
     res.render('partials/cart');

@@ -75,18 +75,44 @@ export const createProductPremium = async (req, res) => {
 export const getProductsPremium = async (req, res) => {
     try {
         const userId = req.user._id;
-        
+
         // Obtener la lista de productos del usuario premium
         const productList = await productDao.getProductsByOwner(userId);
 
         const leanProducts = productList.map(product => product.toObject({ getters: true }));
 
-        res.render('partials/panelPremium', { products: leanProducts});
+        res.render('partials/panelPremium', { products: leanProducts });
     } catch (error) {
         console.error('Error al obtener productos:', error.message);
         res.status(500).send('Error interno del servidor');
     }
 };
+
+export const updateProductPremium = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updatedProductData = req.body;
+        const userId = req.user._id; // ID del usuario premium obtenido desde el token
+        console.log(userId);
+        // Obtener el producto por ID y verificar que el usuario autenticado es el propietario
+        const product = await productDao.getProductsByOwner(userId);
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        // Actualizar el producto
+        const updatedProduct = await productDao.updateProduct(id, updatedProductData);
+
+        req.logger.info('Product updated successfully:', updatedProduct);
+        return res.redirect('/premium/controlpanel');
+    } catch (error) {
+        console.error('Error updating product:', error.message);
+        return res.status(500).redirect("/update-error");
+    }
+};
+
+
 
 
 // export const createProduct = async (req, res) => {
