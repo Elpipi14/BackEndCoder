@@ -131,5 +131,9 @@ routerViews.get('/login-error', async (req, res) => {
     res.render('partials/login-error');
 });
 
+routerViews.get('/error-addCartPremium', async (req, res) => {
+    res.render('partials//error-addCartPremium');
+});
+
 
 export default routerViews;

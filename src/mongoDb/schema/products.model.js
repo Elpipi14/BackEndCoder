@@ -13,7 +13,7 @@ const productsSchema = new Schema({
   stock: { type: Number, required: true },
   category: { type: String, required: true },
   year: { type: String, required: true },
-  owner: { type: String, required: true }
+  owner: { type: String }
   // sizes: { type: Map, of: Number, required: true }
 });
 

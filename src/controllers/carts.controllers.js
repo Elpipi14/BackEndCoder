@@ -1,5 +1,7 @@
 import CartsManager from "../mongoDb/DB/carts.Manager.js";
 import ProductsManager from "../mongoDb/DB/productsManager.js";
+import swal from 'sweetalert';
+
 
 const productDao = new ProductsManager();
 const cartDao = new CartsManager();
@@ -18,12 +20,27 @@ export const addToCart = async (req, res) => {
             return res.redirect('/login');
         }
 
-        // Obtener el ID del carrito del usuario autenticado (si está disponible en el usuario)
-        const cartId = user.cartId;
-        console.log('User cartId:', cartId);
+        // Obtener el producto desde la base de datos
+        const product = await productDao.getById(productId);
 
-        // Agregar el producto al carrito del usuario utilizando el ID del carrito
-        const cart = await cartDao.addToCart(cartId, productId);
+        // Verificar si el usuario premium intenta agregar su propio producto
+        if (product.owner === user._id.toString()) {
+            return res.status(403).redirect('/error-addCartPremium');
+        }
+
+        // Obtener el ID del carrito del usuario autenticado (si está disponible en el usuario)
+        let cartId = user.cartId;
+
+        // Si el usuario no tiene un carrito, crear uno nuevo
+        if (!cartId) {
+            const newCart = await cartDao.createCart();
+            user.cartId = newCart._id;
+            await user.save();
+            cartId = newCart._id;
+        }
+
+        // Agregar el producto al carrito del usuario utilizando el ID del carrito y el ID del usuario
+        const cart = await cartDao.addToCart(cartId, productId, user._id);
         console.log('Cart after adding product:', cart);
 
         // Redirigir al usuario al carrito después de agregar el producto
