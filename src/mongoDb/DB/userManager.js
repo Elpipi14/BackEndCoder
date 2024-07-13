@@ -29,45 +29,100 @@ export default class UserManager {
     async register(userData) {
         try {
             const existingUser = await UserModel.findOne({ email: userData.email });
+
+            //vrifica si el usuario email existe
             if (existingUser) {
                 throw new Error("Email is already registered");
             }
-            // Verifica si el correo electrónico es "adminCoder@coder.com"
-            // y asigna el rol correspondiente
+
+            //verifica que el password sea mas de 6 caracteres
+            if (userData.password.length < 6) {
+                throw new Error("Password must be at least 6 characters long");
+            }
+
+            // Verifica si el correo electrónico es "adminCoder@coder.com" y asigna el rol correspondiente
             if (userData.email === "adminCoder@coder.com") {
                 userData.role = "admin";
             }
 
+            //crear el cart id unico para el usuario
             const cart = await cartManager.createCart({ products: [] })
 
-            const hashedPassword = createHash(userData.password); // Hash de la contraseña
+            //Hashea la constraseña bcrypt
+            const hashedPassword = createHash(userData.password);
+
+            //Al crear el usuario combina los datos con la contraseña hasheada y el cart.
             const newUser = await UserModel.create({ ...userData, password: hashedPassword, cartId: cart._id });
-            // al crear el usuario combina userData con la contraseña hasheada y agrega el carrito con su id.
+
             return newUser;
         } catch (error) {
-            return null;
+            throw error;
         }
     }
 
     async login(email, password) {
         try {
             const userExist = await UserModel.findOne({ email });
-            if (userExist && isValidPassword(password, userExist.password)) {
-                return userExist;
-            } else {
-                return null;
+
+            if (!userExist) {
+                throw new Error("Email is not correct");
             }
+
+            if (!isValidPassword(password, userExist.password)) {
+                throw new Error("Incorrect password");
+            }
+
+            return userExist;
         } catch (error) {
-            console.log("Login failed:", error);
-            throw new Error("Login failed");
+            throw error;
         }
     }
 
-    async changePassword(email, newPassword) {
+    async changePassword(email, oldPassword, newPassword) {
         try {
             const user = await UserModel.findOne({ email });
             if (!user) {
                 throw new Error("User not found");
+            }
+
+            // Verificar si la contraseña antigua es correcta comparando hashes
+            if (!isValidPassword(oldPassword, user.password)) {
+                throw new Error("Old password is incorrect");
+            }
+
+            //verifica que el password sea mas de 6 caracteres
+            if (newPassword.length < 6) {
+                throw new Error("Password must be at least 6 characters long");
+            }
+
+            // Asegúrate de que la nueva contraseña no es la misma que la antigua
+            if (isValidPassword(newPassword, user.password)) {
+                throw new Error("New password cannot be the same as the old password");
+            }
+
+            user.password = createHash(newPassword);
+            await user.save();
+            return user;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+
+    async forgetPassword(email, newPassword) {
+        try {
+            const user = await UserModel.findOne({ email });
+            if (!user) {
+                throw new Error("Email not found");
+            }
+
+            if (newPassword.length < 6) {
+                throw new Error("Password must be at least 6 characters long");
+            }
+
+            // Asegúrate de que la nueva contraseña no es la misma que la antigua
+            if (isValidPassword(newPassword, user.password)) {
+                throw new Error("New password cannot be the same as the old password");
             }
 
             user.password = createHash(newPassword);

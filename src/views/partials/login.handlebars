@@ -1,12 +1,13 @@
 <section class="gradient-custom register">
+    
   <div class="container py-5 h-100">
+     
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-12 col-md-8 col-lg-6 col-xl-5">
         <div class="card bg-dark text-white" style="border-radius: 1rem;">
           <div class="card-body p-5 text-center">
-
             <div class="mb-md-5 mt-md-2 pb-2">
-
+              <h2 id="success-alert" style="display: none; color: green; margin-bottom: 1rem;"></h2>
             <form action="/login" method="post">
                 <div class="form-outline form-white mb-4">
                     <input type="email" id="email" name="email" class="form-control form-control-lg" />
@@ -18,9 +19,7 @@
                     <label class="form-label" for="password">Password</label>
                 </div>
 
-              <p class="small mb-5 pb-lg-2"><a class="text-white-50" href="#!">Forgot password?</a></p>
-
-    
+                <p class="small pb-lg-2"><a class="text-white-50" href="/request-password-change">Forgot password?</a></p>    
               <button class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
             </form>
             <div>
@@ -36,3 +35,21 @@
     </div>
   </div>
 </section>
+
+    <script>
+        // Verifica si hay un mensaje en la URL y guárdalo en sessionStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        if (message) {
+            sessionStorage.setItem('successMessage', decodeURIComponent(message));
+            window.history.replaceState({}, document.title, window.location.pathname); // Elimina el mensaje de la URL
+        }
+
+        // Verifica si hay un mensaje en sessionStorage
+        const successMessage = sessionStorage.getItem('successMessage');
+        if (successMessage) {
+            document.getElementById('success-alert').style.display = 'block';
+            document.getElementById('success-alert').innerText = successMessage;
+            sessionStorage.removeItem('successMessage'); // Borra el mensaje de sessionStorage
+        }
+    </script>

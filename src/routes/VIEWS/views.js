@@ -64,14 +64,28 @@ routerViews.get('/ticketDetails', passport.authenticate("jwt", { session: false 
 });
 
 //cambio de password
-routerViews.get('/changepassword', async (req, res) => {
+routerViews.get('/change-password', passport.authenticate("jwt", { session: false, failureRedirect: "/profile" }), async (req, res) => {
     res.render('partials/changepassword');
 });
 
-routerViews.get('/changepassword-error', async (req, res) => {
-    res.render('partials/changepassword-error');
+routerViews.get('/request-password-change', async (req, res) => {
+    res.render('partials/formChangePassword');
 });
 
+routerViews.get('/forgot-password', async (req, res) => {
+    res.render('partials/forgot-Password');
+});
+
+routerViews.get('/forgot-error', async (req, res) => {
+    const message = req.query.message || 'An unknown error occurred';
+    res.render('partials/forgot-error', { message });
+});
+
+
+routerViews.get('/changepassword-error', async (req, res) => {
+    const message = req.query.message || 'An unknown error occurred';
+    res.render('partials/changepassword-error', { message });
+});
 
 ///-------chat´s---------///
 
@@ -124,11 +138,13 @@ routerViews.get('/profile', passport.authenticate("jwt", { session: false }), as
 
 //errores de vistas
 routerViews.get('/register-error', async (req, res) => {
-    res.render('partials/register-error');
+    const message = req.query.message || 'An unknown error occurred';
+    res.render('partials/register-error', { message });
 });
 
 routerViews.get('/login-error', async (req, res) => {
-    res.render('partials/login-error');
+    const message = req.query.message || 'An unknown error occurred';
+    res.render('partials/login-error', { message });
 });
 
 routerViews.get('/error-addCartPremium', async (req, res) => {
