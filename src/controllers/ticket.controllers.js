@@ -77,7 +77,6 @@ export const getUserTickets = async (req, res) => {
     }
 };
 
-
 export const getTicketDetails = async (req, res) => {
     try {
         const { ticketId } = req.params;

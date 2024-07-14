@@ -25,7 +25,7 @@ export const addToCart = async (req, res) => {
 
         // Verificar si el usuario premium intenta agregar su propio producto
         if (product.owner === user._id.toString()) {
-            return res.status(403).redirect('/error-addCartPremium');
+            return res.status(403).redirect('/error-addCartPremium?message=You cannot add your own product to your cart.');
         }
 
         // Obtener el ID del carrito del usuario autenticado (si está disponible en el usuario)
@@ -39,9 +39,13 @@ export const addToCart = async (req, res) => {
             cartId = newCart._id;
         }
 
+        if (product.stock <= 0) {
+            return res.status(200).json({ message: "Stock limit reached", product: product.title });
+        }
+
         // Agregar el producto al carrito del usuario utilizando el ID del carrito y el ID del usuario
         const cart = await cartDao.addToCart(cartId, productId, user._id);
-        console.log('Cart after adding product:', cart);
+        req.logger.info("Cart after adding product:", cart)
 
         // Redirigir al usuario al carrito después de agregar el producto
         res.redirect('/cart');
@@ -76,7 +80,8 @@ export const getCart = async (req, res, next) => {
 
             const productsWithDetails = Array.from(productMap.values());
 
-            res.render('partials/cart', { products: productsWithDetails, cartId: cartId, total: cart.total });
+            // Pasar el mensaje de error a la vista si está presente en los parámetros de consulta
+            res.render('partials/cart', { products: productsWithDetails, cartId: cartId, total: cart.total, error: req.query.error });
         } else {
             res.render('partials/cart', { products: [], total: 0 });
         }
@@ -85,6 +90,7 @@ export const getCart = async (req, res, next) => {
         res.status(500).send('Error interno del servidor');
     }
 };
+
 
 export const getById = async (req, res, next) => {
     try {
@@ -107,39 +113,27 @@ export const deleteProduct = async (req, res) => {
 
         // Obtener el carrito actualizado
         const cart = await cartDao.getById(cartId);
-        const products = cart.products;
 
-        // Crear un mapa para almacenar los productos agrupados por su ID
+        // Obtener detalles completos de cada producto
         const productMap = new Map();
-
-        // Iterar sobre cada producto y agregarlo al mapa
-        for (const item of products) {
-            const productId = item.product;
-            const productDetails = await productDao.getById(productId);
-            if (productMap.has(productId)) {
-                // Si el producto ya está en el mapa, sumar la cantidad
-                const existingProduct = productMap.get(productId);
-                existingProduct.quantity += item.quantity;
-            } else {
-                // Si el producto no está en el mapa, agregarlo
-                productMap.set(productId, {
-                    product: productDetails,
-                    quantity: item.quantity,
-                    _id: item._id
-                });
-            }
+        for (const item of cart.products) {
+            const productDetails = await productDao.getById(item.product);
+            productMap.set(item.product, {
+                product: productDetails,
+                quantity: item.quantity,
+                _id: item._id
+            });
         }
-
-        // Convertir el mapa de productos a un array
         const productsWithDetails = Array.from(productMap.values());
 
-        // Renderizar la vista del carrito pasando los productos con sus detalles
-        res.render('partials/cart', { products: productsWithDetails });
+        // Renderizar la vista del carrito pasando los productos con sus detalles y el nuevo total
+        res.render('partials/cart', { products: productsWithDetails, cartId: cartId, total: cart.total, alertMessage: 'Producto eliminado del carrito' });
     } catch (error) {
         console.error('Error deleting product from cart:', error.message);
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 export const deleteCart = async (req, res) => {
     try {
@@ -162,9 +156,16 @@ export const increaseProductQuantity = async (req, res) => {
         res.redirect('/cart');
     } catch (error) {
         console.error('Error increasing product quantity:', error.message);
-        res.status(500).send('Internal Server Error');
+
+        // Si el error es por falta de stock, redirigir con un mensaje de error
+        if (error.message.includes('No stock available for product')) {
+            return res.redirect(`/cart?error=No hay más stock disponible para este producto`);
+        }
+
+        res.status(500).redirect('/cart');
     }
 };
+
 
 export const decreaseProductQuantity = async (req, res) => {
     try {
@@ -173,7 +174,9 @@ export const decreaseProductQuantity = async (req, res) => {
         res.redirect('/cart');
     } catch (error) {
         console.error('Error decreasing product quantity:', error.message);
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ error: error.message });
     }
 };
+
+
 

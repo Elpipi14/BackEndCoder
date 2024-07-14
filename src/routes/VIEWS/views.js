@@ -148,7 +148,8 @@ routerViews.get('/login-error', async (req, res) => {
 });
 
 routerViews.get('/error-addCartPremium', async (req, res) => {
-    res.render('partials//error-addCartPremium');
+    const message = req.query.message || 'An unknown error occurred';
+    res.render('partials//error-addCartPremium', { message });
 });
 
 

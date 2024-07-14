@@ -2,23 +2,21 @@ import { CartModel } from "../schema/carts.model.js";
 import { ProductsModel } from "../schema/products.model.js";
 
 export default class CartsManager {
-
+    // Función para crear un nuevo carrito
     async createCart() {
         try {
             const newCart = new CartModel({
-                // Inicializa el carrito sin productos
                 products: [],
             });
-            // Guarda el nuevo carrito en la base de datos
             await newCart.save();
             return newCart;
         } catch (error) {
             console.error(error);
-            console.error("Error create cart", error);
-            throw error;
+            throw new Error("Error creating cart");
         }
     }
 
+    // Función para agregar un producto al carrito
     async addToCart(cartId, productId) {
         try {
             const product = await ProductsModel.findById(productId);
@@ -33,10 +31,6 @@ export default class CartsManager {
             let cart = await CartModel.findById(cartId);
             if (!cart) {
                 throw new Error(`Cart not found for ID: ${cartId}`);
-            }
-
-            if (!cart.products) {
-                cart.products = [];
             }
 
             const existingProduct = cart.products.find(item => item.product.equals(productId));
@@ -57,11 +51,12 @@ export default class CartsManager {
             cart = await cart.save();
             return cart;
         } catch (error) {
-            console.error("Error add product to cart", error);
+            console.error("Error adding product to cart", error);
             throw error;
         }
     }
 
+    // Función para calcular el total del carrito
     async calculateTotal(products) {
         let total = 0;
         for (const item of products) {
@@ -71,26 +66,30 @@ export default class CartsManager {
         return total;
     }
 
+
+    // Función para obtener todos los carritos
     async getAll() {
         try {
-            const carts = await CartModel.find()
+            const carts = await CartModel.find();
             return carts;
         } catch (error) {
-            console.log(error);
+            console.error(error);
             throw error;
         }
     }
 
+    // Función para obtener un carrito por su ID
     async getById(id) {
         try {
-            //obtener un carrito por su ID con sus productos
             const cart = await CartModel.findById(id);
             return cart;
         } catch (error) {
-            console.error("error searching ID", error);
-        };
-    };
+            console.error("Error searching ID", error);
+            throw new Error("Error searching cart by ID");
+        }
+    }
 
+    // Función para eliminar un producto del carrito
     async deleteProduct(cartId, productId) {
         try {
             const cart = await CartModel.findById(cartId);
@@ -121,17 +120,8 @@ export default class CartsManager {
         }
     }
 
-    async deleteCart(cartId) {
-        try {
-            // Elimina el carrito por su ID
-            const deletedCart = await CartModel.findByIdAndDelete(cartId);
-            return deletedCart;
-        } catch (error) {
-            console.error("error delete cart", error);
-            throw error;
-        }
-    };
 
+    // Función para vaciar el carrito
     async deleteCart(cartId) {
         try {
             const updatedCart = await CartModel.findByIdAndUpdate(cartId, { $set: { products: [], total: 0 } }, { new: true });
@@ -140,8 +130,8 @@ export default class CartsManager {
             console.error('Error deleting cart:', error);
             throw error;
         }
-    };
-
+    }
+    // Función para aumentar la cantidad de un producto en el carrito
     async increaseQuantity(cartId, productId) {
         try {
             const cart = await CartModel.findById(cartId);
@@ -177,6 +167,7 @@ export default class CartsManager {
         }
     }
 
+    // Función para disminuir la cantidad de un producto en el carrito
     async decreaseQuantity(cartId, productId) {
         try {
             const cart = await CartModel.findById(cartId);
@@ -194,12 +185,12 @@ export default class CartsManager {
                 throw new Error(`Product not found in cart`);
             }
 
-            if (cartProduct.quantity <= 1) {
-                throw new Error(`Cannot decrease quantity below 1`);
-            }
-
             cartProduct.quantity -= 1;
             product.stock += 1;
+
+            if (cartProduct.quantity <= 0) {
+                cart.products = cart.products.filter(p => !p.product.equals(productId));
+            }
 
             await product.save();
 
@@ -211,5 +202,5 @@ export default class CartsManager {
             throw error;
         }
     }
-};
 
+}
